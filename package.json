@@ -1,0 +1,30 @@
+{
+  "name": "capstone-01602-hussain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FaizanH/capstone-01602-hussain.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FaizanH/capstone-01602-hussain/issues"
+  },
+  "homepage": "https://github.com/FaizanH/capstone-01602-hussain#readme",
+  "dependencies": {
+    "async": "^3.2.0",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "ip": "^1.1.5",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^5.0.0"
+  }
+}
