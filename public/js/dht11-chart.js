@@ -2,7 +2,7 @@ const canvas = document.getElementById('dht11');
 let data = {
   labels: ['Status'],
   datasets: [{
-    label: '溫度偵測',
+    label: 'Temperature',
     fill: true,
     lineTension: 0.1,
     backgroundColor: 'rgba(75,192,192,0.4)',
@@ -23,7 +23,7 @@ let data = {
     data: [28],
   },
   {
-    label: '濕度偵測',
+    label: 'Humidity',
     fill: true,
     lineTension: 0.1,
     backgroundColor: 'rgba(39,119,182,.4)',

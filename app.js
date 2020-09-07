@@ -31,7 +31,7 @@ app.use(express.static(__dirname.concat('/public')));
 // app.use('js', express.static('public/css'));
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname+'view/index.html', { title: "Index" });
+    res.sendFile(__dirname+'/views/index.html', { title: "Index" });
 });
 
 // app.get('/login', (req, res) => {
