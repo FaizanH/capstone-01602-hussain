@@ -10,13 +10,23 @@ const express = require('express')
 , io = require('socket.io').listen(server)
 , ip = require('ip')
 , rpiDhtSensor = require('rpi-dht-sensor')
-, rpio = require('rpio');
+, rpio = require('rpio')
+, SerialPort = require("serialport")
+, GPS = require("gps");
 
 /* Database */
 const sqlite3 = require('sqlite3').verbose();
 var db;
 var sensordb = './db/sensorData.db';
 var sqlitedb = require('./db/sqlitedb.js');
+
+/* GPS Init */
+Readline = SerialPort.parsers.Readline;
+const port = new SerialPort("/dev/ttyS0", {
+	baudRate: 9600,
+	parser: new Readline('\r\n')
+});
+const gps = new GPS();
 
 /* Environment */
 app.set('port', process.env.PORT || 4000);
@@ -58,41 +68,26 @@ io.on('connection', function(socket) {
     console.log('client connected');
 
     setInterval(() => {
-//    	// Read values from SPI ch0
-//	rpio.spiBegin();
-//	// Prepare TV buffer
-//	var sendBuffer = new Buffer([0x01, (8 + 0 << 4), 0x01]);
-//	// Send TV buffer via MOSI and MISO
-//	var recieveBuffer = rpio.spiTransfer(sendBuffer, sendBuffer.length);
-//	
-//	// Extract val from output buffer
-//	var junk = recieveBuffer[0],
-//	    MSB = recieveBuffer[1],
-//	    LSB = recieveBuffer[2];
-//	
-//	// Ignore 6b of MSB, shift and combine
-//	var value = ((MSB & 3) << 8) + LSB;
-//	console.log('ch' + ((sendBuffer[1] >> 4) - 8), '=', value);
-
-rpio.spiBegin();
-
-// Prepare TX buffer [trigger byte = 0x01] [channel 0 = 0x80 (128)] [dummy data = 0x01]
-var txBuffer = new Buffer([0x01, (8 + 0 << 4), 0x01]); 
-
-var rxBuffer = new Buffer(8);
-// Send TX buffer to SPI MOSI and recieve RX buffer from MISO
-rpio.spiTransfer(txBuffer, rxBuffer, txBuffer.length);
-
-// Extract value from output buffer. Ignore first byte (junk). 
-var junk = rxBuffer[0],
-    MSB = rxBuffer[1],
-    LSB = rxBuffer[2];
-
-// Ignore first six bits of MSB, bit shift MSB 8 positions and 
-// lastly combine LSB with MSB to get a full 10 bit value
-var ldrVal = ((MSB & 3) << 8) + LSB; 
-
-console.log('ch' + ((txBuffer[1] >> 4) - 8), '=', ldrVal);
+    	// Read values from SPI ch0
+	rpio.spiBegin();
+	
+	// Prepare TX buffer [trigger byte = 0x01] [channel 0 = 0x80 (128)] [dummy data = 0x01]
+	var txBuffer = new Buffer([0x01, (8 + 0 << 4), 0x01]); 
+	
+	var rxBuffer = new Buffer(8);
+	// Send TX buffer to SPI MOSI and recieve RX buffer from MISO
+	rpio.spiTransfer(txBuffer, rxBuffer, txBuffer.length);
+	
+	// Extract value from output buffer. Ignore first byte (junk). 
+	var junk = rxBuffer[0],
+	    MSB = rxBuffer[1],
+	    LSB = rxBuffer[2];
+	
+	// Ignore first six bits of MSB, bit shift MSB 8 positions and 
+	// lastly combine LSB with MSB to get a full 10 bit value
+	var ldrVal = ((MSB & 3) << 8) + LSB; 
+	
+//	console.log('ch' + ((txBuffer[1] >> 4) - 8), '=', ldrVal);
 
     	// Read values from DHT sensor
         const dht = new rpiDhtSensor.DHT11(22);
@@ -108,4 +103,25 @@ console.log('ch' + ((txBuffer[1] >> 4) - 8), '=', ldrVal);
 	    ldrVal,
 	});
     }, 3000);
+});
+
+// Read GPS co-ordinates from /dev/ttyS0
+gps.on("data", async data => {
+	const latitude = data.lat,
+	      longitude = data.lon;
+	if(data.type == "GGA") {
+		if(data.quality != null) {
+			console.log("["+data.lat+", "+data.lon+"]");
+			io.emit('gprsdat', {
+				latitude, longitude,
+			});
+		}
+		else {
+			console.log("NO GPS FIX AVAILABLE");
+		}
+	}
+});
+
+port.on("data", function (data) {
+	gps.updatePartial(data);
 });

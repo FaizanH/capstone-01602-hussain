@@ -2,7 +2,7 @@
   const socket = io.connect();
 
   socket.on('dht11', function (data) {
-    console.log(data);
+//    console.log(data);
     const d = new Date();
     if (tempChart.data.datasets[0].data.length < 10) {
       tempChart.data.datasets[0].data.push(data.temp);

@@ -2,7 +2,7 @@
   const socket = io.connect();
 
   socket.on('ldr', function (data) {
-    console.log(data);
+//    console.log(data);
     const d = new Date();
     if (luminosityChart.data.datasets[0].data.length < 10) {
       luminosityChart.data.datasets[0].data.push(data.ldrVal);
