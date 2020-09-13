@@ -70,24 +70,19 @@ io.on('connection', function(socket) {
     setInterval(() => {
     	// Read values from SPI ch0
 	rpio.spiBegin();
-	
+
 	// Prepare TX buffer [trigger byte = 0x01] [channel 0 = 0x80 (128)] [dummy data = 0x01]
 	var txBuffer = new Buffer([0x01, (8 + 0 << 4), 0x01]); 
-	
 	var rxBuffer = new Buffer(8);
 	// Send TX buffer to SPI MOSI and recieve RX buffer from MISO
 	rpio.spiTransfer(txBuffer, rxBuffer, txBuffer.length);
-	
 	// Extract value from output buffer. Ignore first byte (junk). 
 	var junk = rxBuffer[0],
 	    MSB = rxBuffer[1],
 	    LSB = rxBuffer[2];
-	
 	// Ignore first six bits of MSB, bit shift MSB 8 positions and 
 	// lastly combine LSB with MSB to get a full 10 bit value
 	var ldrVal = ((MSB & 3) << 8) + LSB; 
-	
-//	console.log('ch' + ((txBuffer[1] >> 4) - 8), '=', ldrVal);
 
     	// Read values from DHT sensor
         const dht = new rpiDhtSensor.DHT11(22);
