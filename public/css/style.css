@@ -1,0 +1,36 @@
+html,body,.login {
+    height: 100vh;
+    margin-bottom: 0px !important;
+}
+.page-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.asset-content {
+
+}
+.dashboard-nav {
+    background-color: #90a4ae;
+}
+.sidenav-trigger {
+    z-index: 99;
+}
+.material-icons {
+    
+}
+.brand-logo {
+    margin-left: 10px;
+}
+.search-filters {
+    
+}
+.breadcrumb {
+    
+}
+.date-picker {
+    margin-top: 14px;
+}
+.asset-selections {
+    padding-top: 10px !important;
+}

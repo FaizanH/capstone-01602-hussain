@@ -1,60 +1,22 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>CAsset-Portal</title>
+
+<head>
+	<title>CAsset Portal</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<link rel="icon" href="" type="image/x-icon">
-    </head>
-    <body>
-    	<div id="app">
-	
-		{{ message }}
-	
-	</div>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
 
-        <div>
-		<p style='text-align:center;padding-bottom:36px;'>Warehouse Management System - Mesh Network - Child Node</p>
-        </div>
-	<div class="row">
-        	<div class="col-12 col-sm-6">
-	        	<canvas id="dht11" width="100%" height="100%"></canvas>
-	        </div>
+<body>
+	<div style="text-align:left;">
+        <a style='padding-bottom:36px;' href="/login">Login</a>
 	</div>
-	<br>
-	<div class="row">
-		<div class="col-12 col-sm-6">
-			<canvas id="ldr" width="100%" height="100%"></canvas>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-12 col-sm-6">
-			<h1><strong>GPRS Co-ordinates</strong></h1>
-			<p id="gprsLat" width="100%" height="100%"></p>
-			<p id="gprsLon" width="100%" height="100%"></p>
-		</div>
-	</div>
-	<div style="bottom:0;padding-top:36px;text-align:right;">Capstone 01602 by Syed H.</div>
+	<div style="bottom:0;padding-top:36px;text-align:center;">Capstone 01602 by Syed H.</div>
 
 	<script type="text/javascript" src="js/materialize.min.js"></script>
-        <script type="text/javascript" src="js/vue.js"></script>
-        <script type="text/javascript" src="js/socket.io.js"></script>
-        <script type="text/javascript" src="js/Chart.min.js"></script>
-	<script>
-		new Vue({
-			el: '#app',
-			data: {
-				message: 'CAsset Front-End Build'
-			}
-		});
-	</script>
+</body>
 
-        <script src="js/dht11-chart.js"></script>
-        <script src="js/dht11-socket.js"></script>
-	<script src="js/ldr-chart.js"></script>
-	<script src="js/ldr-socket.js"></script>
-	<script src="js/gprs-socket.js"></script>
-    </body>
 </html>
