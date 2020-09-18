@@ -1,0 +1,15 @@
+identity:
+  orgId: "gav3dy"
+  typeId: "raspi"
+  deviceId: "RaspiMeshNode1"
+auth:
+  token: "zm6lbOjpL6-m?)QC4@"
+options:
+  domain: internetofthings.ibmcloud.com
+  logLevel: info
+  mqtt:
+    port: 8883
+    transport: tcp
+    cleanStart: true
+    sessionExpiry: 3600
+    keepAlive: 60
