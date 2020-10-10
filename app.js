@@ -1,7 +1,5 @@
-// import { DeviceClient, DeviceConfig } from '@wiotp/sdk';
 const { DeviceClient, DeviceConfig } = require('@wiotp/sdk');
 const { v4: uuidv4 } = require('uuid');
-// import { v4 as uuidv4 } from 'uuid';
 
 /*
  * Dependencies
@@ -40,10 +38,10 @@ let deviceConfig = null;
 let deviceClient = null;
 
 /* Database */
-const sqlite3 = require('sqlite3').verbose();
-var db;
-var sensordb = './db/sensorData.db';
-var sqlitedb = require('./db/sqlitedb.js');
+// const sqlite3 = require('sqlite3').verbose();
+// var db;
+// var sensordb = './db/sensorData.db';
+// var sqlitedb = require('./db/sqlitedb.js');
 
 /* GPS Init */
 Readline = SerialPort.parsers.Readline;
@@ -65,9 +63,6 @@ app.use(express.static(__dirname.concat('/public')));
 // app.use(express.static('public'));
 // app.use('css', express.static('public/css'));
 // app.use('js', express.static('public/css'));
-
-/* Middleware */
-//app.use(express.json());
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/views/index.html', { title: "Index" });

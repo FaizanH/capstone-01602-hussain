@@ -1,0 +1,17 @@
+identity:
+  appID: front-end-app
+auth:
+  key: a-gav3dy-ejmr4bqpaf
+  token: Q+c6PkxXFoR@xsg8Fx
+options:
+  domain: internetofthings.ibmcloud.com
+  logLevel: debug
+  http:
+    verify: True
+  mqtt:
+    instanceId: instance1
+    port: 8883
+    transport: tcp
+    cleanStart: true
+    sessionExpiry: 7200
+    keepAlive: 120
