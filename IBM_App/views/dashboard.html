@@ -1,12 +1,203 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>CAsset Portal - Dashboard</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/materialize.min.css">
         <link rel="stylesheet" href="css/style.css" type="text/css">
+        <script src="js/jquery-3.5.1.min.js"></script>
+        <script src="js/custom.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
     </head>
     <body>
-        <div id="status">DISCONNECTED</div>
+        <div class="row header">
+            <nav>
+                <div class="nav-wrapper">
+                    <a href="#" class="brand-logo">CAsset</a>
+                    <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="#">ASSETS</a></li>
+                        <li><a href="#">SENSORS</a></li>
+                        <li><a href="#">NETWORK</a></li>
+                        <li><a href="#">USERS</a></li>
+                        <li><a href="#">STATUS</a></li>
+                        <li><a href="#">LOGOUT</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <ul class="sidenav" id="mobile-demo">
+                <li><a href="#">ASSETS</a></li>
+                <li><a href="#">SENSORS</a></li>
+                <li><a href="#">NETWORK</a></li>
+                <li><a href="#">USERS</a></li>
+                <li><a href="#">STATUS</a></li>
+                <li><a href="#">LOGOUT</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col s6">
+                <!-- Search Bar -->
+                <nav>
+                    <div class="nav-wrapper">
+                        <form>
+                        <div class="input-field">
+                            <input id="search" type="search" required>
+                            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                            <i class="material-icons">close</i>
+                        </div>
+                        </form>
+                    </div>
+                </nav>
+            </div>
+            <div class="col s6 search-filters">
+                <div class="row">
+                    <div class="input-field col s4">
+                        <select multiple>
+                            <option value="" disabled selected>SELECT</option>
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                        </select>
+                        <label>Node State</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <select multiple>
+                            <option value="" disabled selected>SELECT</option>
+                            <option value="1">SYDNEY</option>
+                            <option value="2">MELBOURNE</option>
+                            <option value="2">BRISBANE</option>
+                        </select>
+                        <label>Network Domain</label>
+                    </div>
+                    <div class="col s4 date-picker">
+                        <input type="text" class="datepicker" placeholder="Last Active Date">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 asset-content">
+                    <!-- Page content  -->
+                    <table class="responsive-table highlight centered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox"/>
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th>ID</th>
+                                <th>BID</th>
+                                <th>GATEWAY</th>
+                                <th>DDC</th>
+                                <th>STATE</th>
+                                <th>NETWORK DOMAIN</th>
+                            </tr>
+                        </thead>
+                
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox"/>
+                                        <span></span>
+                                    </label>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox"/>
+                                        <span></span>
+                                    </label>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox"/>
+                                        <span></span>
+                                    </label>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s5 asset-selections">
+                    <!-- Dropdown Trigger -->
+                    <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>Selected</a>
+                    
+                    <!-- Dropdown Structure -->
+                    <ul id='dropdown1' class='dropdown-content'>
+                        <li><a href="#!">Report</a></li>
+                        <li><a href="#!">Disable</a></li>
+                    </ul>
+                </div>
+                <div class="col s7 asset-pagination">
+                    <ul class="pagination">
+                        <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                        <li class="active"><a href="#!">1</a></li>
+                        <li class="waves-effect"><a href="#!">2</a></li>
+                        <li class="waves-effect"><a href="#!">3</a></li>
+                        <li class="waves-effect"><a href="#!">4</a></li>
+                        <li class="waves-effect"><a href="#!">5</a></li>
+                        <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3>DEVELOPMENT AREA</h3>
+        </div>
+        <div id="state">WAITING FOR INITIALISATION...</div>
+        <div id="deviceInfo">No Device Information Available. Check if your device has been initialised.</div>
         <div id="lastError"></div>
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <canvas id="dht11" width="100%" height="100%"></canvas>
+            </div>
+        </div>
+        <!-- <br> -->
+        <!-- <div class="row">
+            <div class="col-12 col-sm-6">
+                <canvas id="ldr" width="100%" height="100%"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <h1><strong>GPRS Co-ordinates</strong></h1>
+                <p id="gprsLat" width="100%" height="100%"></p>
+                <p id="gprsLon" width="100%" height="100%"></p>
+            </div>
+        </div> -->
 
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script type="text/javascript" src="js/mustache.js"></script>
         <script type="text/javascript" src="js/socket.io.js"></script>
+        <script type="text/javascript" src="js/Chart.min.js"></script>
+        <script src="js/custom.js"></script>
+        <script src="js/requests.js"></script>
+        <script src="js/socketCommands.js"></script>
     </body>
 </html>

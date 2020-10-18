@@ -50,15 +50,6 @@ setTimeout(() => {
 
 initializeClient();
 
-// io.on('connection', function (socket) {
-//     console.log('client connected');
-    
-// 	setInterval(() => {
-//         // Do client stuff here
-//         console.log("Hello, friend.")
-//     }, 3000);
-// });
-
 function initializeClient() {
     if (appClient != null) {
         console.log("Client is already initialized");
@@ -69,6 +60,23 @@ function initializeClient() {
         startClient();
     }
 }
+// io.on('connection', function (socket) {
+//     console.log('client connected');
+    
+// 	setInterval(() => {
+//         // Do client stuff here
+//         console.log("Hello, friend.")
+//     }, 3000);
+// });
+
+io.on('connection', function (socket) {
+    console.log('front-end client connected');
+    let state = "GETTING DEVICE STATE...";
+    let deviceInfo = "WAITING FOR INITIALISATION..."
+    socket.emit('status', {
+        state, deviceInfo,
+    });
+});
 
 function getDeviceCommandData(device) {
     console.log(`Command recieved: ${device.data}\n`);
@@ -89,10 +97,10 @@ function startClient() {
 
     // Connectivity callbacks
     appClient.on("connect", function () {
-        // document.getElementById("status").innerHTML = "CONNECTED";
         console.log("App Connected");
         // appClient.commandCallback = getDeviceData;
         appClient.subscribeToEvents("raspi", "RaspiMeshNode1","sensor","json", 0);
+        appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
     });
 
     appClient.on("deviceEvent", function (typeId, deviceId, eventId, format, payload) {
@@ -101,6 +109,27 @@ function startClient() {
         console.log(str);
     });
 
+    appClient.on("deviceStatus", function (typeId, deviceId, payload) {
+        // document.getElementById("status").innerHTML = "OFFLINE";
+        let str = JSON.parse(payload);
+        let state = `${deviceId} Status: ` + str.Action;
+
+        if (str.Action == "Connect") {
+            state = `${deviceId} Connected : ` + str.Time;
+        }
+        if (str.Action == "Disconnect") {
+            state = `${deviceId} Disconnected \n Last Connected: ` + str.Time;
+        }
+
+        let deviceInfo = "Client Address: " + str.ClientAddr + ", SecureToken: " + str.Secure;
+
+        console.log(state);
+        console.log(deviceInfo);
+
+        io.emit('status', {
+			state, deviceInfo,
+		});
+    });
     // appClient.on("reconnect", function () {
     //     // document.getElementById("status").innerHTML = "RECONNECTING";
     //     console.log("Reconnecting");
@@ -108,37 +137,22 @@ function startClient() {
     // appClient.on("close", function () {
     //     // document.getElementById("status").innerHTML = "DISCONNECTED";
     //     console.log("Disconnected");
+    //     let status = "DISCONNECTED";
+    //     io.emit('status', {
+	// 		status,
+	// 	});
     // });
     // appClient.on("offline", function () {
     //     // document.getElementById("status").innerHTML = "OFFLINE";
     //     console.log("Offline");
+    //     let status = "OFFLINE";
+    //     io.emit('status', {
+	// 		status,
+	// 	});
     // });
 
     // Error callback
     appClient.on("error", function (err) {
-        // document.getElementById("lastError").innerHTML = err;
         console.log("Error: " + err);
     });
 }
-
-// function connect() {
-//     if (appClient == null) {
-//         document.getElementById("lastError").innerHTML = "Client is not initialized!";
-//         return;
-//     }
-//     appClient.connect();
-// }
-// function disconnect() {
-//     if (appClient == null) {
-//         document.getElementById("lastError").innerHTML = "Client is not initialized!";
-//         return;
-//     }
-//     appClient.disconnect();
-// }
-// function subscribeToEvents() {
-//     if (appClient == null) {
-//         document.getElementById("lastError").innerHTML = "Need to initialize client before you can subscribe to events!";
-//         return;
-//     }
-//     appClient.subscribeToEvents("+", "+", "+", "+", 0);
-// }

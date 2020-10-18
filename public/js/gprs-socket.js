@@ -10,8 +10,8 @@
 
   socket.on('gprsdat', function (data) {
 //    console.log(data);
-	gprsLat.innerHTML = data.latitude;
-	gprsLon.innerHTML = data.longitude;
+	  gprsLat.innerHTML = data.latitude;
+	  gprsLon.innerHTML = data.longitude;
   });
   
 })();
