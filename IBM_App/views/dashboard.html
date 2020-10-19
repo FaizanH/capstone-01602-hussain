@@ -70,9 +70,9 @@
                         </select>
                         <label>Network Domain</label>
                     </div>
-                    <div class="col s4 date-picker">
+                    <!-- <div class="col s4 date-picker">
                         <input type="text" class="datepicker" placeholder="Last Active Date">
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="row">
@@ -95,36 +95,7 @@
                                 <th>NETWORK DOMAIN</th>
                             </tr>
                         </thead>
-                
                         <tbody>
-                            <tr>
-                                <td>
-                                    <label>
-                                        <input type="checkbox"/>
-                                        <span></span>
-                                    </label>
-                                </td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label>
-                                        <input type="checkbox"/>
-                                        <span></span>
-                                    </label>
-                                </td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                            </tr>
                             <tr>
                                 <td>
                                     <label>
@@ -170,14 +141,20 @@
         <div>
             <h3>DEVELOPMENT AREA</h3>
         </div>
-        <div id="state">WAITING FOR INITIALISATION...</div>
-        <div id="deviceInfo">No Device Information Available. Check if your device has been initialised.</div>
+        <h4>Specific Device Information</h4>
+        <div id="state">DEVICE INFO: WAITING FOR DEVICE...</div>
+        <div id="deviceInfo">DEVICE IP: WAITING FOR DEVICE...</div>
+        <div id="deviceSensorData1">No Event Data Available for Sensor 1 - Temp</div>
+        <div id="deviceSensorData2">No Event Data Available for Sensor 2 - LDR</div>
+        <div id="deviceSensorData3">No Event Data Available for Sensor 3 - GPS</div>
+        <h4>List Devices</h4>
+        <div id="deviceslist">DEVICE LIST: WAITING FOR DEVICE...</div>
         <div id="lastError"></div>
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-12 col-sm-6">
                 <canvas id="dht11" width="100%" height="100%"></canvas>
             </div>
-        </div>
+        </div> -->
         <!-- <br> -->
         <!-- <div class="row">
             <div class="col-12 col-sm-6">
@@ -192,12 +169,41 @@
             </div>
         </div> -->
 
+        <script type="text/javascript" src="js/jquery-3.5.1.js"></script>
         <script type="text/javascript" src="js/materialize.min.js"></script>
-        <script type="text/javascript" src="js/mustache.js"></script>
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script type="text/javascript" src="js/Chart.min.js"></script>
-        <script src="js/custom.js"></script>
-        <script src="js/requests.js"></script>
         <script src="js/socketCommands.js"></script>
+        <script src="js/custom.js"></script>
+        <script type="text/javascript" src="js/mustache.js"></script>
+        <script src="js/requests.js"></script>
+
+        <!-- Add template here -->
+        <script id="taskstmpl" type="text/template">
+            <thead>
+                <tr>
+                    <th scope="col" ><input type="checkbox" id="selectAll" onclick="selectAll()" aria-label="Select Device"/></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">BID</th>
+                    <th scope="col">GATEWAY</th>
+                    <th scope="col">DDC</th>
+                    <th scope="col">STATE</th>
+                    <th scope="col">NETWORK DOMAIN</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{#data}}
+                <tr class="dataRow{{isHighlighted}}">
+                    <td id="checkbox"><input {{isChecked}} type="checkbox" id="toggle" onclick="toggleSelect('{{id}}')" onclick="selectAll();" aria-label="Select Device"/></td>
+                    <td id="id">{{id}}</td>
+                    <td id="bid">{{bid}}</td>
+                    <td id="gateway">{{gateway}}</td>
+                    <td id="ddc">{{ddc}}</td>
+                    <td id="state">{{state}}</td>
+                    <td id="network">{{network}}</td>
+                </tr>
+            {{/data}}
+            </tbody>
+        </script>
     </body>
 </html>

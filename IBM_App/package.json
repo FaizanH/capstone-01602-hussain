@@ -12,8 +12,11 @@
     "@wiotp/sdk": "^0.7.8",
     "async": "^3.2.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "ip": "^1.1.5",
+    "js-yaml": "^3.14.0",
+    "request": "^2.88.2",
     "socket.io": "^2.3.0"
   }
 }

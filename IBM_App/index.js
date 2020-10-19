@@ -1,4 +1,4 @@
-const { ApplicationClient, ApplicationConfig } = require('@wiotp/sdk');
+const { ApplicationClient, ApplicationConfig, RegistryClient } = require('@wiotp/sdk');
 
 /*
  * Dependencies
@@ -10,7 +10,10 @@ const express = require('express')
 	, async = require('async')
 	, server = require('http').createServer(app)
 	, io = require('socket.io').listen(server)
-	, ip = require('ip');
+    , ip = require('ip')
+    , request = require('request')
+    , fs = require('fs')
+    , yaml = require('js-yaml');
 
 let appClient = null;
 let appConfig = null;
@@ -48,88 +51,110 @@ setTimeout(() => {
 	});
 }, 2000);
 
-initializeClient();
+// // Return promise for connection
+// io.connectAsync = function(url, options) {
+//     return new Promise(function(resolve, reject) {
+//         io.connect(url, options);
+//         io.once('connect', function(socket) {
+//             resolve(socket);
+//         });
+//         io.once('connect_error', function() {
+//             reject(new Error('connect_error'));
+//         });
+//         io.once('connect_timeout', function() {
+//             reject(new Error('connect_timeout'));
+//         });
+//     });
+// }
 
-function initializeClient() {
-    if (appClient != null) {
-        console.log("Client is already initialized");
-    }
-    else {
-        // Configure App Client
-        appConfig = ApplicationConfig.parseConfigFile("Config_ApplicationClient.yaml");
-        startClient();
-    }
-}
-// io.on('connection', function (socket) {
-//     console.log('client connected');
-    
-// 	setInterval(() => {
-//         // Do client stuff here
-//         console.log("Hello, friend.")
-//     }, 3000);
-// });
+// io.connectAsync().then(function(socket) {
 
+// })
 io.on('connection', function (socket) {
     console.log('front-end client connected');
-    let state = "GETTING DEVICE STATE...";
-    let deviceInfo = "WAITING FOR INITIALISATION..."
-    socket.emit('status', {
-        state, deviceInfo,
-    });
+
+    appConfig = ApplicationConfig.parseConfigFile("Config_ApplicationClient.yaml");
+    appClient = new ApplicationClient(appConfig);
+    appClient.connect();
+    console.log("Client Initialized");
+    startClient();
+
+    // REST API - Get all devices
+    // Used to manage all devices on platform
+    try {
+        let fileContents = fs.readFileSync('Config_RESTClient.yaml', 'utf8');
+        let data = yaml.safeLoad(fileContents);
+        let org = data.identity.orgId
+        , api = data.auth.key
+        , tok = data.auth.token;
+        // Do API call
+        GETDEVICES(org, api, tok).then(function(response) {
+            let deviceslist = response.results[0].deviceId;
+            io.emit('devices', {
+                deviceslist,
+            });
+        });
+    } catch (e) {
+        console.log(e);
+    }
+    // Populate table with nodes
+
+    // let state = "GETTING DEVICE STATE...";
+    // let deviceInfo = "WAITING FOR INITIALISATION...";
+    // let temp = "WAITING FOR INITIALISATION...";
+    // let ldr = "WAITING FOR INITIALISATION...";
+    // let gps = "WAITING FOR INITIALISATION...";
+    // let deviceslist = "WAITING FOR INITIALISATION...";
+    // socket.emit('status', {
+    //     state, deviceInfo,
+    // });
+    // socket.emit('event', { // changed to socket instead of io.
+    //     temp, ldr, gps,
+    // });
+    // socket.emit('devices', {
+    //     deviceslist,
+    // });
 });
 
-function getDeviceCommandData(device) {
-    console.log(`Command recieved: ${device.data}\n`);
-}
-
 function startClient() {
-    appClient = new ApplicationClient(appConfig);
-    // Use sockets to push information to front-end
-    // Event callbacks
-    // appClient.on("deviceEvent", function (typeId, deviceId, eventId, format, payload) {
-    //     console.log("Device Event from :: " + typeId + " : " + deviceId + " of event " + eventId + " with format " + format + " - payload = " + payload);
-    // });
-    if (appClient == null) {
-        console.log("Client is not initialized!");
-        return;
-    }
-    appClient.connect();
-
     // Connectivity callbacks
     appClient.on("connect", function () {
         console.log("App Connected");
         // appClient.commandCallback = getDeviceData;
         appClient.subscribeToEvents("raspi", "RaspiMeshNode1","sensor","json", 0);
-        appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
+        // appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
     });
-
-    appClient.on("deviceEvent", function (typeId, deviceId, eventId, format, payload) {
-        let jsonData = JSON.stringify(payload);
-        let str = `${eventId} event recieved from ${deviceId}:\n ${jsonData}\n`;
+    appClient.on("deviceEvent", function (typeid, deviceId, eventId, format, payload) {
+        let str = `${eventId} event recieved from ${deviceId}:\n ${payload}\n`;
         console.log(str);
+        let temp = "temp: "+JSON.parse(payload).DHT_Temp;
+        let ldr = "ldr: "+ JSON.parse(payload).LDR_Lum;
+        let gps = "gps: "+ JSON.parse(payload).GPS_Co;
+
+        io.emit('event', {
+            temp, ldr, gps,
+        });
     });
+    // appClient.on("deviceStatus", function (typeId, deviceId, payload) {
+    //     // document.getElementById("status").innerHTML = "OFFLINE";
+    //     let str = JSON.parse(payload);
+    //     let state = `${deviceId} Status: ` + str.Action;
+    //     if (str.Action == "Connect") {
+    //         state = `${deviceId} Connected : ` + str.Time;
+    //     }
+    //     if (str.Action == "Disconnect") {
+    //         state = `${deviceId} Disconnected \n Last Connected: ` + str.Time;
+    //     }
+    //     let deviceInfo = str.ClientAddr + ", SecureToken: " + str.Secure;
 
-    appClient.on("deviceStatus", function (typeId, deviceId, payload) {
-        // document.getElementById("status").innerHTML = "OFFLINE";
-        let str = JSON.parse(payload);
-        let state = `${deviceId} Status: ` + str.Action;
+    //     console.log(state);
+    //     console.log(deviceInfo);
 
-        if (str.Action == "Connect") {
-            state = `${deviceId} Connected : ` + str.Time;
-        }
-        if (str.Action == "Disconnect") {
-            state = `${deviceId} Disconnected \n Last Connected: ` + str.Time;
-        }
+    //     io.emit('status', {
+	// 		state, deviceInfo,
+	// 	});
+    // });
 
-        let deviceInfo = "Client Address: " + str.ClientAddr + ", SecureToken: " + str.Secure;
-
-        console.log(state);
-        console.log(deviceInfo);
-
-        io.emit('status', {
-			state, deviceInfo,
-		});
-    });
     // appClient.on("reconnect", function () {
     //     // document.getElementById("status").innerHTML = "RECONNECTING";
     //     console.log("Reconnecting");
@@ -155,4 +180,34 @@ function startClient() {
     appClient.on("error", function (err) {
         console.log("Error: " + err);
     });
+}
+
+function GETDEVICES(orgId, APIKEY, AUTHTOKEN) {
+    return new Promise((resolve, reject) => {
+        const options = {
+            async: true,
+            crossDomain: true,
+            url: "https://" + orgId + ".internetofthings.ibmcloud.com/api/v0002/bulk/devices/",
+            method: "GET",
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Basic " + Buffer.from(APIKEY + ":" + AUTHTOKEN).toString('base64')
+            },
+        };
+
+        request(options, function (error, response, body) {
+            // in addition to parsing the value, deal with possible errors
+            if (error) return reject(error);
+            try {
+                // JSON.parse() can throw an exception if not valid JSON
+                resolve(JSON.parse(body));
+            } catch(e) {
+                reject(e);
+            }
+        });
+    });
+}
+
+function getDeviceCommandData(device) {
+    console.log(`Command recieved: ${device.data}\n`);
 }
