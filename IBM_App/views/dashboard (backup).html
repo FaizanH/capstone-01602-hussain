@@ -55,6 +55,7 @@
                 <div class="row">
                     <div class="input-field col s4">
                         <select multiple>
+                            <option value="" disabled selected>SELECT</option>
                             <option value="1">Active</option>
                             <option value="2">Inactive</option>
                         </select>
@@ -62,6 +63,7 @@
                     </div>
                     <div class="input-field col s4">
                         <select multiple>
+                            <option value="" disabled selected>SELECT</option>
                             <option value="1">SYDNEY</option>
                             <option value="2">MELBOURNE</option>
                             <option value="2">BRISBANE</option>
@@ -86,22 +88,27 @@
                                     </label>
                                 </th>
                                 <th>ID</th>
-                                <th>TYPE</th>
+                                <th>BID</th>
                                 <th>GATEWAY</th>
-                                <th>SKU</th>
+                                <th>DDC</th>
                                 <th>STATE</th>
-                                <!-- <th>NETWORK DOMAIN</th> -->
+                                <th>NETWORK DOMAIN</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr id="list-node-1">
-                                <td><label><input type="checkbox"/><span></span></label></td>
-                                <td class="id">0</td>
-                                <td id="type">0</td>
-                                <td id="gateway">0</td>
-                                <td class="sku">0</td>
-                                <td class="state">0</td>
-                                <!-- <td id="network">0</td> -->
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox"/>
+                                        <span></span>
+                                    </label>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,7 +118,7 @@
                 <div class="col s5 asset-selections">
                     <!-- Dropdown Trigger -->
                     <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>Selected</a>
-
+                    
                     <!-- Dropdown Structure -->
                     <ul id='dropdown1' class='dropdown-content'>
                         <li><a href="#!">Report</a></li>
@@ -130,50 +137,13 @@
                       </ul>
                 </div>
             </div>
-            <div id="modal" class="modal">
-                <div class="modal-content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <h2>Node - <span class="id"></span></h2>
-                            <a style="float:right;right:0;" class="waves-effect waves-light btn">Flag ⚐</a>
-                            <h5>| Naming |</h5>
-                            <div class="input-field col s6">
-                            <label type="text" class="validate">Name: <span class="id"></span></label>
-                            </div>
-                            <div class="input-field col s6">
-                                <label type="text" class="validate">SKU: <span class="sku"></span></label>
-                            </div>
-                        </div>
-                        <div stlye="padding-bottom: 20px;" class="row"></div>
-                        <div class="row">
-                            <a class="waves-effect waves-light btn">Archive</a>
-                            <a class="waves-effect waves-light btn">Locate</a>
-                        </div>
-                        <hr/>
-                        <div class="row">
-                            <h5>| State |</h5>
-                            <div class="col s12">
-                                <p>State: <span class="state"></span></p>
-                                <p>IPV4 Address: <span class="ip"></span></p>
-                                <p>Serial Number: <span id="serial"></span></p>
-                                <p>Manufacturer: <span id="manufacturer"></span></p>
-                                <p>Model Number: <span id="model"></span></p>
-                                <p>Internal Description: <span id="description"></span></p>
-                                <p>Metadata: <span id="metadata"></span></p>
-                                <a style="bottom:0;left:0;float:left;" class="waves-effect waves-light btn">Disable</a>
-                                <a style="bottom:0;right:0;float:right;" class="waves-effect waves-light btn">Save</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <div>
             <h3>DEVELOPMENT AREA</h3>
         </div>
         <h4>Specific Device Information</h4>
-        <!-- <div id="state">DEVICE INFO: WAITING FOR DEVICE...</div> -->
-        <!-- <div id="deviceInfo">DEVICE IP: WAITING FOR DEVICE...</div> -->
+        <div id="state">DEVICE INFO: WAITING FOR DEVICE...</div>
+        <div id="deviceInfo">DEVICE IP: WAITING FOR DEVICE...</div>
         <div id="deviceSensorData1">No Event Data Available for Sensor 1 - Temp</div>
         <div id="deviceSensorData2">No Event Data Available for Sensor 2 - LDR</div>
         <div id="deviceSensorData3">No Event Data Available for Sensor 3 - GPS</div>
@@ -207,5 +177,33 @@
         <script src="js/custom.js"></script>
         <script type="text/javascript" src="js/mustache.js"></script>
         <script src="js/requests.js"></script>
+
+        <!-- Add template here -->
+        <script id="taskstmpl" type="text/template">
+            <thead>
+                <tr>
+                    <th scope="col" ><input type="checkbox" id="selectAll" onclick="selectAll()" aria-label="Select Device"/></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">BID</th>
+                    <th scope="col">GATEWAY</th>
+                    <th scope="col">DDC</th>
+                    <th scope="col">STATE</th>
+                    <th scope="col">NETWORK DOMAIN</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{#data}}
+                <tr class="dataRow{{isHighlighted}}">
+                    <td id="checkbox"><input {{isChecked}} type="checkbox" id="toggle" onclick="toggleSelect('{{id}}')" onclick="selectAll();" aria-label="Select Device"/></td>
+                    <td id="id">{{id}}</td>
+                    <td id="bid">{{bid}}</td>
+                    <td id="gateway">{{gateway}}</td>
+                    <td id="ddc">{{ddc}}</td>
+                    <td id="state">{{state}}</td>
+                    <td id="network">{{network}}</td>
+                </tr>
+            {{/data}}
+            </tbody>
+        </script>
     </body>
 </html>
