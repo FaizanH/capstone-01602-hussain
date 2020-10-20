@@ -77,7 +77,6 @@ io.on('connection', function (socket) {
     appClient = new ApplicationClient(appConfig);
     appClient.connect();
     console.log("Client Initialized");
-    startClient();
 
     // REST API - Get all devices
     // Used to manage all devices on platform
@@ -87,16 +86,62 @@ io.on('connection', function (socket) {
         let org = data.identity.orgId
         , api = data.auth.key
         , tok = data.auth.token;
+
         // Do API call
         GETDEVICES(org, api, tok).then(function(response) {
+            console.log(response);
+            console.log(response.results[0].deviceInfo);
+            console.log(response.results[0].registration);
+            console.log(response.results[0].status);
+            console.log(response.results[0].metadata);
             let deviceslist = response.results[0].deviceId;
-            io.emit('devices', {
+            let state = `Connected: ${response.results[0].status.alert.enabled}`;
+            let id = response.results[0].deviceId;
+            let type = response.results[0].typeId;
+            let gateway = "";
+
+            let serial = response.results[0].deviceInfo.serialNumber;
+            let manufacturer = response.results[0].deviceInfo.manufacturer;
+            let model = response.results[0].deviceInfo.model;
+            let description = response.results[0].deviceInfo.description;
+            let code = response.results[0].metadata.item_specification.sku;
+            let metadata = JSON.stringify(response.results[0].metadata);
+            console.log(metadata);
+            console.log(code);
+            // let descriptiveLocation = JSON.stringify(response.results[0].deviceInfo.descriptiveLocation);
+            // let registration = JSON.stringify(response.results[0].registration);
+            if (response.results[0].status.alert.enabled == true) {
+                state = `Connected : ` + response.results[0].status.alert.timestamp;
+            }
+            if (response.results[0].status.alert.enabled == false) {
+                state = `Disconnected \n Last Connected: ` + response.results[0].status.alert.timestamp;
+            }
+
+            socket.emit('devices', {
                 deviceslist,
+            });
+            socket.emit('device', {
+                id,
+                type,
+                gateway,
+                state,
+            });
+            socket.emit('deviceInfoOnStandby', {
+                serial,
+                manufacturer,
+                model,
+                description,
+                // fwversion,
+                // descriptiveLocation,
+                code,
+                metadata,
+                // registration,
             });
         });
     } catch (e) {
         console.log(e);
     }
+    startClient();
     // Populate table with nodes
 
     // let state = "GETTING DEVICE STATE...";
@@ -122,7 +167,7 @@ function startClient() {
         console.log("App Connected");
         // appClient.commandCallback = getDeviceData;
         appClient.subscribeToEvents("raspi", "RaspiMeshNode1","sensor","json", 0);
-        // appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
+        appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
     });
     appClient.on("deviceEvent", function (typeid, deviceId, eventId, format, payload) {
         let str = `${eventId} event recieved from ${deviceId}:\n ${payload}\n`;
@@ -135,25 +180,36 @@ function startClient() {
             temp, ldr, gps,
         });
     });
-    // appClient.on("deviceStatus", function (typeId, deviceId, payload) {
-    //     // document.getElementById("status").innerHTML = "OFFLINE";
-    //     let str = JSON.parse(payload);
-    //     let state = `${deviceId} Status: ` + str.Action;
-    //     if (str.Action == "Connect") {
-    //         state = `${deviceId} Connected : ` + str.Time;
-    //     }
-    //     if (str.Action == "Disconnect") {
-    //         state = `${deviceId} Disconnected \n Last Connected: ` + str.Time;
-    //     }
-    //     let deviceInfo = str.ClientAddr + ", SecureToken: " + str.Secure;
+    appClient.on("deviceStatus", function (typeId, deviceId, payload) {
+        let str = JSON.parse(payload);
+        console.log(str);
 
-    //     console.log(state);
-    //     console.log(deviceInfo);
+        let state = `${deviceId} Status: ` + str.Action;
+        let id = deviceId;
+        let type = typeId;
+        let gateway = "";
 
-    //     io.emit('status', {
-	// 		state, deviceInfo,
-	// 	});
-    // });
+        if (str.Action == "Connect") {
+            state = `Connected : ` + str.Time;
+        }
+        if (str.Action == "Disconnect") {
+            state = `Disconnected \n Last Connected: ` + str.Time;
+        }
+        let ip = str.ClientAddr + ", SecureToken: " + str.Secure;
+
+        io.emit('status', {
+			state,
+        });
+        io.emit('device', {
+            id,
+            type,
+            gateway,
+            state,
+        });
+        io.emit('deviceInfoOnConnect', {
+            ip,
+        });
+    });
 
     // appClient.on("reconnect", function () {
     //     // document.getElementById("status").innerHTML = "RECONNECTING";
