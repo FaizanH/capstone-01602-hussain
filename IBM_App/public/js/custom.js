@@ -3,6 +3,11 @@ $(document).ready(function () {
     $('.datepicker').datepicker();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown();
+    $('#list-node-1').click(function() {
+        $('#modal').modal();
+        $('#modal').modal('open');
+    });
+
 });
 
 $(document).on("click", "#open-nav", function(){
