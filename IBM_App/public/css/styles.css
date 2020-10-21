@@ -1,20 +1,43 @@
+html {
+    font-size: 11pt;
+}
 body {
     font-family: tahoma;
-    font-size: 12pt;
+    font-size: 11pt;
+}
+label {
+    font-size: 11pt;
+    color: black;
+}
+.show-more {
+    color: grey;
+}
+.state-status {
+    color: grey;
+}
+.modal {
+    width: 80%;
+    max-height: 80%
 }
 
-div#status {
-    font-weight: bold; 
-    border:1px solid #000; 
-    padding: 5px;
-    margin: 5px;
+.sensor-view {
+    display: none;
 }
-
-div#lastError {
-    font-family: consolas;
-    background-color: red; 
-    color: #fff; 
-    border:1px solid #000; 
-    padding: 5px;
-    margin: 5px;
+.sensor-status-dht11 {
+    background-color: lightgrey;
+    color: black;
+    padding: 5px 15px 5px 15px;
+}
+.sensor-status-ldr {
+    background-color: lightgrey;
+    color: black;
+    padding: 5px 15px 5px 15px;
+}
+.sensor-status-gps {
+    background-color: lightgrey;
+    color: black;
+    padding: 5px 15px 5px 15px;
+}
+.gps-status {
+    display: block;
 }

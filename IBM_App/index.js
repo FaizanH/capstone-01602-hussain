@@ -29,7 +29,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname.concat('/public')));
 // app.use(express.static('public'));
 // app.use('css', express.static('public/css'));
-// app.use('js', express.static('public/css'));
+// app.use('js', express.static('public/js'));
 
 // app.get('/', (req, res) => {
 // 	res.sendFile(__dirname + '/views/index.html', { title: "Index" });
@@ -51,25 +51,6 @@ setTimeout(() => {
 	});
 }, 2000);
 
-// // Return promise for connection
-// io.connectAsync = function(url, options) {
-//     return new Promise(function(resolve, reject) {
-//         io.connect(url, options);
-//         io.once('connect', function(socket) {
-//             resolve(socket);
-//         });
-//         io.once('connect_error', function() {
-//             reject(new Error('connect_error'));
-//         });
-//         io.once('connect_timeout', function() {
-//             reject(new Error('connect_timeout'));
-//         });
-//     });
-// }
-
-// io.connectAsync().then(function(socket) {
-
-// })
 io.on('connection', function (socket) {
     console.log('front-end client connected');
 
@@ -142,42 +123,31 @@ io.on('connection', function (socket) {
         console.log(e);
     }
     startClient();
-    // Populate table with nodes
-
-    // let state = "GETTING DEVICE STATE...";
-    // let deviceInfo = "WAITING FOR INITIALISATION...";
-    // let temp = "WAITING FOR INITIALISATION...";
-    // let ldr = "WAITING FOR INITIALISATION...";
-    // let gps = "WAITING FOR INITIALISATION...";
-    // let deviceslist = "WAITING FOR INITIALISATION...";
-    // socket.emit('status', {
-    //     state, deviceInfo,
-    // });
-    // socket.emit('event', { // changed to socket instead of io.
-    //     temp, ldr, gps,
-    // });
-    // socket.emit('devices', {
-    //     deviceslist,
-    // });
 });
 
 function startClient() {
     // Connectivity callbacks
     appClient.on("connect", function () {
         console.log("App Connected");
-        // appClient.commandCallback = getDeviceData;
         appClient.subscribeToEvents("raspi", "RaspiMeshNode1","sensor","json", 0);
         appClient.subscribeToDeviceStatus("raspi", "RaspiMeshNode1", 0);
     });
     appClient.on("deviceEvent", function (typeid, deviceId, eventId, format, payload) {
         let str = `${eventId} event recieved from ${deviceId}:\n ${payload}\n`;
         console.log(str);
-        let temp = "temp: "+JSON.parse(payload).DHT_Temp;
-        let ldr = "ldr: "+ JSON.parse(payload).LDR_Lum;
-        let gps = "gps: "+ JSON.parse(payload).GPS_Co;
+        let temp = JSON.parse(payload).DHT_Temp;
+        let humid = JSON.parse(payload).DHT_Hum;
+        let ldrVal = JSON.parse(payload).LDR_Lum;
+        let gps = JSON.parse(payload).GPS_Co;
 
-        io.emit('event', {
-            temp, ldr, gps,
+        io.emit('event-dht11', {
+            temp, humid,
+        });
+        io.emit('event-ldr', {
+            ldrVal,
+        });
+        io.emit('event-gps', {
+            gps,
         });
     });
     appClient.on("deviceStatus", function (typeId, deviceId, payload) {
@@ -185,20 +155,21 @@ function startClient() {
         console.log(str);
 
         let state = `${deviceId} Status: ` + str.Action;
+        let lastUpdated = str.Time;
         let id = deviceId;
         let type = typeId;
         let gateway = "";
 
         if (str.Action == "Connect") {
-            state = `Connected : ` + str.Time;
+            state = "Connected";
         }
         if (str.Action == "Disconnect") {
-            state = `Disconnected \n Last Connected: ` + str.Time;
+            state = "Disconnected";
         }
         let ip = str.ClientAddr + ", SecureToken: " + str.Secure;
 
         io.emit('status', {
-			state,
+			state, lastUpdated,
         });
         io.emit('device', {
             id,
@@ -250,7 +221,6 @@ function GETDEVICES(orgId, APIKEY, AUTHTOKEN) {
                 "Authorization": "Basic " + Buffer.from(APIKEY + ":" + AUTHTOKEN).toString('base64')
             },
         };
-
         request(options, function (error, response, body) {
             // in addition to parsing the value, deal with possible errors
             if (error) return reject(error);
@@ -262,8 +232,4 @@ function GETDEVICES(orgId, APIKEY, AUTHTOKEN) {
             }
         });
     });
-}
-
-function getDeviceCommandData(device) {
-    console.log(`Command recieved: ${device.data}\n`);
 }
